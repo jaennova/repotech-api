@@ -2,36 +2,31 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 
-class ResourceBase(BaseModel):
-    title: str
-    description: str
-    image: Optional[str] = None
-    url: str
-    tags: List[str]
-    status: str = "pending"
+class TagBase(BaseModel):
+    nombre: str
 
-class ResourceCreate(ResourceBase):
+class TagCreate(TagBase):
     pass
 
-class ResourceResponse(ResourceBase):
+class TagResponse(TagBase):
     id: int
-    created_at: datetime
-    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
 
-class CategoryBase(BaseModel):
-    name: str
-    icon: str
+class RecursoBase(BaseModel):
+    titulo: str
+    descripcion: str
+    url: str
+
+class RecursoCreate(RecursoBase):
     tags: List[str]
-    parent_id: Optional[int] = None
 
-class CategoryCreate(CategoryBase):
-    pass
-
-class CategoryResponse(CategoryBase):
+class RecursoResponse(RecursoBase):
     id: int
+    fecha_creacion: datetime
+    fecha_actualizacion: datetime
+    tags: List[TagResponse]
 
     class Config:
         from_attributes = True
