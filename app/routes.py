@@ -6,6 +6,8 @@ from app.database import get_db
 from app.models import Recurso, Tag
 from app.schemas import RecursoCreate, RecursoResponse, TagResponse
 
+router = APIRouter()
+
 @router.post("/recursos/", response_model=RecursoResponse)
 def create_recurso(recurso: RecursoCreate, db: Session = Depends(get_db)):
     try:
