@@ -57,3 +57,64 @@ def create_recurso(recurso: RecursoCreate, db: Session = Depends(get_db)):
             status_code=500,
             detail="Error interno del servidor"
         )
+
+@router.get("/recursos/", response_model=List[RecursoResponse])
+def get_recursos(db: Session = Depends(get_db)):
+    try:
+        recursos = db.query(Recurso).all()
+        return recursos
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Error al obtener los recursos"
+        )
+
+@router.get("/tags/", response_model=List[TagResponse])
+def get_tags(db: Session = Depends(get_db)):
+    try:
+        tags = db.query(Tag).all()
+        return tags
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Error al obtener los tags"
+        )
+
+@router.get("/recursos/{recurso_id}", response_model=RecursoResponse)
+def get_recurso(recurso_id: int, db: Session = Depends(get_db)):
+    try:
+        recurso = db.query(Recurso).filter(Recurso.id == recurso_id).first()
+        if not recurso:
+            raise HTTPException(
+                status_code=404,
+                detail="Recurso no encontrado"
+            )
+        return recurso
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Error al obtener el recurso"
+        )
+
+@router.delete("/recursos/{recurso_id}")
+def delete_recurso(recurso_id: int, db: Session = Depends(get_db)):
+    try:
+        recurso = db.query(Recurso).filter(Recurso.id == recurso_id).first()
+        if not recurso:
+            raise HTTPException(
+                status_code=404,
+                detail="Recurso no encontrado"
+            )
+        db.delete(recurso)
+        db.commit()
+        return {"message": "Recurso eliminado exitosamente"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Error al eliminar el recurso"
+        )
