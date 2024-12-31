@@ -1,2 +1,1 @@
-# TODO: Modify this Procfile to fit your needs
-web: gunicorn app:app
+web: gunicorn app.main:app --bind 0.0.0.0:8080
