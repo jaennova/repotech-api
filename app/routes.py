@@ -58,6 +58,10 @@ def create_recurso(recurso: RecursoCreate, db: Session = Depends(get_db)):
             detail="Error interno del servidor"
         )
 
+@router.get("/")
+def read_root():
+    return {"message": "Bienvenido a la API de recursos"}
+
 @router.get("/recursos/", response_model=List[RecursoResponse])
 def get_recursos(db: Session = Depends(get_db)):
     try:
