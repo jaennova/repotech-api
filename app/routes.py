@@ -77,9 +77,12 @@ def create_resource(recurso: RecursoCreate, db: Session = Depends(get_db)):
 def search_resources(
     q: Optional[str] = None,
     tag: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 10,
     db: Session = Depends(get_db)
 ):
     query = db.query(Recurso)
+    
     if q:
         query = query.filter(
             Recurso.titulo.ilike(f"%{q}%") | 
@@ -87,7 +90,16 @@ def search_resources(
         )
     if tag:
         query = query.join(Recurso.tags).filter(Tag.nombre == tag)
-    return query.all()
+    
+    total = query.count()
+    recursos = query.offset(skip).limit(limit).all()
+    
+    return {
+        "total": total,
+        "recursos": recursos,
+        "skip": skip,
+        "limit": limit
+    }
 
 @router.delete("/recursos/{recurso_id}")
 def delete_resource(recurso_id: int, db: Session = Depends(get_db)):
