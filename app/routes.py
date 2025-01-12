@@ -12,6 +12,17 @@ router = APIRouter()
 def read_root():
     return {"message": "Bienvenido a la API de recursos"}
 
+@router.get("/recursos/", response_model=List[RecursoResponse])
+def get_recursos(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    try:
+        recursos = db.query(Recurso).offset(skip).limit(limit).all()
+        return recursos
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail= f"Error al obtener los recursos {e}"
+        )
+
 @router.post("/recursos/", response_model=RecursoResponse)
 def create_resource(recurso: RecursoCreate, db: Session = Depends(get_db)):
     try:
@@ -60,17 +71,6 @@ def create_resource(recurso: RecursoCreate, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=500,
             detail="Error interno del servidor"
-        )
-
-@router.get("/recursos/", response_model=List[RecursoResponse])
-def get_resources(db: Session = Depends(get_db)):
-    try:
-        recursos = db.query(Recurso).all()
-        return recursos
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail="Error al obtener los recursos"
         )
 
 @router.delete("/recursos/{recurso_id}")
