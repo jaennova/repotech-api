@@ -94,6 +94,19 @@ def delete_resource(recurso_id: int, db: Session = Depends(get_db)):
             detail="Error al eliminar el recurso"
         )
 
+@router.delete("/recursos/nombre/{titulo}")
+def delete_resource_by_name(titulo: str, db: Session = Depends(get_db)):
+    recurso = db.query(Recurso).filter(Recurso.titulo == titulo).first()
+    if not recurso:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No se encontró un recurso con el título: {titulo}"
+        )
+    
+    db.delete(recurso)
+    db.commit()
+    return {"message": f"Recurso '{titulo}' eliminado exitosamente"}
+
 @router.get("/tags/", response_model=List[TagResponse])
 def get_tags(db: Session = Depends(get_db)):
     try:
@@ -143,3 +156,16 @@ def get_tag_by_id(recurso_id: int, db: Session = Depends(get_db)):
             status_code=500,
             detail="Error al obtener el recurso"
         )
+
+@router.delete("/tags/nombre/{nombre}")
+def delete_tag_by_name(nombre: str, db: Session = Depends(get_db)):
+    tag = db.query(Tag).filter(Tag.nombre == nombre).first()
+    if not tag:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No se encontró un tag con el nombre: {nombre}"
+        )
+    
+    db.delete(tag)
+    db.commit()
+    return {"message": f"Tag '{nombre}' eliminado exitosamente"}
