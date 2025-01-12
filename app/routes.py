@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from typing import List
+from typing import List, Optional
 from app.database import get_db
 from app.models import Recurso, Tag
 from app.schemas import RecursoCreate, RecursoResponse, TagResponse
@@ -72,6 +72,22 @@ def create_resource(recurso: RecursoCreate, db: Session = Depends(get_db)):
             status_code=500,
             detail="Error interno del servidor"
         )
+
+@router.get("/recursos/buscar/")
+def search_resources(
+    q: Optional[str] = None,
+    tag: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Recurso)
+    if q:
+        query = query.filter(
+            Recurso.titulo.ilike(f"%{q}%") | 
+            Recurso.descripcion.ilike(f"%{q}%")
+        )
+    if tag:
+        query = query.join(Recurso.tags).filter(Tag.nombre == tag)
+    return query.all()
 
 @router.delete("/recursos/{recurso_id}")
 def delete_resource(recurso_id: int, db: Session = Depends(get_db)):
