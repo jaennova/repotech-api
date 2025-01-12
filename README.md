@@ -1,7 +1,7 @@
 # API de Recursos Tecnológicos
 
 ## Descripción
-API REST construida con FastAPI para gestionar recursos tecnológicos y sus tags asociados. La API permite crear, listar y eliminar recursos y tags, utilizando SQLAlchemy para la gestión de base de datos y Pydantic para la validación de datos.
+API REST construida con FastAPI para gestionar recursos tecnológicos y sus tags asociados. La API permite crear, listar, buscar y eliminar recursos y tags, utilizando SQLAlchemy para la gestión de base de datos y Pydantic para la validación de datos.
 
 ## Estructura del Proyecto
 ```
@@ -74,11 +74,19 @@ gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker
 - **POST /recursos/**: Crear nuevo recurso
 - **GET /recursos/**: Obtener lista de recursos
 - **GET /recursos/{recurso_id}**: Obtener recurso por ID
-- **DELETE /recursos/{recurso_id}**: Eliminar recurso
+- **DELETE /recursos/{recurso_id}**: Eliminar recurso por ID
+- **DELETE /recursos/nombre/{titulo}**: Eliminar recurso por título
+- **GET /recursos/buscar/**: Buscar recursos con filtros y paginación
+  - Parámetros opcionales:
+    - q: término de búsqueda
+    - tag: filtrar por tag
+    - skip: número de registros a saltar
+    - limit: límite de registros por página
 
 ### Tags
 - **GET /tags/**: Obtener lista de tags
-- **DELETE /tags/{tag_id}**: Eliminar tag
+- **DELETE /tags/{tag_id}**: Eliminar tag por ID
+- **DELETE /tags/nombre/{nombre}**: Eliminar tag por nombre
 
 ## Modelos de Datos
 
@@ -101,11 +109,27 @@ gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker
 ```
 
 ## Características
-- CORS habilitado para integración con frontend
+- CORS habilitado para integración con frontend (repotech.vercel.app y localhost:4321)
+- Búsqueda y filtrado de recursos
+- Paginación de resultados
 - Manejo de errores personalizado
 - Validación de datos con Pydantic
 - Soporte para PostgreSQL
 - Documentación automática (Swagger UI)
+
+## Ejemplo de Búsqueda y Paginación
+```
+GET /recursos/buscar/?q=python&tag=backend&skip=0&limit=10
+```
+Respuesta:
+```json
+{
+    "total": 100,
+    "recursos": [],
+    "skip": 0,
+    "limit": 10
+}
+```
 
 ## Documentación API
 La documentación interactiva está disponible en:
