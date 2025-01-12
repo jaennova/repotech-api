@@ -1,7 +1,7 @@
 # API de Recursos Tecnológicos
 
 ## Descripción
-Este proyecto es una API construida con FastAPI para gestionar recursos tecnológicos y sus categorías. Utiliza SQLAlchemy para la interacción con la base de datos y Pydantic para la validación de datos.
+API REST construida con FastAPI para gestionar recursos tecnológicos y sus tags asociados. La API permite crear, listar y eliminar recursos y tags, utilizando SQLAlchemy para la gestión de base de datos y Pydantic para la validación de datos.
 
 ## Estructura del Proyecto
 ```
@@ -12,45 +12,105 @@ repotech-api/
 │   ├── database.py
 │   ├── models.py
 │   ├── routes.py
-│   └── schemas.py
+│   ├── schemas.py
+│   └── middleware.py
 ├── .env
-└── requirements.txt
+├── requirements.txt
+└── .gitignore
 ```
 
-### Archivos Principales
-- **`main.py`**: Inicializa la aplicación FastAPI y define las rutas de la API
-- **`database.py`**: Configura la conexión a la base de datos y gestiona las sesiones
-- **`models.py`**: Define los modelos de datos usando SQLAlchemy
-- **`schemas.py`**: Define los esquemas de validación de datos usando Pydantic
-- **`routes.py`**: Contiene las definiciones de los endpoints de la API
+## Tecnologías Principales
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- PostgreSQL
+- Uvicorn
+- Gunicorn (para producción)
 
 ## Requisitos
-Asegúrate de tener Python 3.7 o superior instalado. Luego instala las dependencias del proyecto:
+- Python 3.7 o superior
+- PostgreSQL
+
+## Instalación
+1. Clonar el repositorio:
+```bash
+git clone https://github.com/jaennova/repotech-api.git
+cd repotech-api
+```
+
+2. Crear y activar entorno virtual:
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+```
+
+3. Instalar dependencias:
 ```bash
 pip install -r requirements.txt
 ```
 
-## Configuración
-Crea un archivo `.env` en la raíz del proyecto y define tu URL de base de datos:
+4. Configurar variables de entorno:
+Crear archivo `.env` en la raíz del proyecto:
 ```
 DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/nombrebd
 ```
 
-## Ejecutar la Aplicación
-Para ejecutar la aplicación, usa el siguiente comando:
+## Ejecución
+### Desarrollo
 ```bash
 uvicorn app.main:app --reload
 ```
-La API estará disponible en `http://localhost:8000` y la documentación interactiva en `http://localhost:8000/docs`.
+
+### Producción
+```bash
+gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker
+```
 
 ## Endpoints de la API
-- **GET /**: Obtener mensaje de bienvenida y lista de endpoints disponibles
-- **POST /api/resources/**: Crear un nuevo recurso
-- **GET /api/resources/**: Obtener lista de recursos
-- **GET /api/resources/{resource_id}**: Obtener recurso específico por ID
-- **POST /api/categories/**: Crear una nueva categoría
-- **GET /api/categories/**: Obtener lista de categorías
-- **GET /api/categories/{category_id}**: Obtener categoría específica por ID
 
-## Contribuciones
-Las contribuciones son bienvenidas. No dudes en abrir un issue o enviar un pull request.
+### Recursos
+- **GET /**: Mensaje de bienvenida
+- **POST /recursos/**: Crear nuevo recurso
+- **GET /recursos/**: Obtener lista de recursos
+- **GET /recursos/{recurso_id}**: Obtener recurso por ID
+- **DELETE /recursos/{recurso_id}**: Eliminar recurso
+
+### Tags
+- **GET /tags/**: Obtener lista de tags
+- **DELETE /tags/{tag_id}**: Eliminar tag
+
+## Modelos de Datos
+
+### Recurso
+```json
+{
+  "titulo": "string",
+  "descripcion": "string",
+  "url": "string",
+  "tags": ["string"]
+}
+```
+
+### Tag
+```json
+{
+  "id": "integer",
+  "nombre": "string"
+}
+```
+
+## Características
+- CORS habilitado para integración con frontend
+- Manejo de errores personalizado
+- Validación de datos con Pydantic
+- Soporte para PostgreSQL
+- Documentación automática (Swagger UI)
+
+## Documentación API
+La documentación interactiva está disponible en:
+- Swagger UI: `/docs`
+- ReDoc: `/redoc`
+
+## Despliegue
+La API está desplegada en Render y utiliza una base de datos PostgreSQL.
