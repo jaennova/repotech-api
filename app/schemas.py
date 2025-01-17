@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
-
+from enum import Enum
 class TagBase(BaseModel):
     nombre: str
 
@@ -30,3 +30,8 @@ class RecursoResponse(RecursoBase):
 
     class Config:
         from_attributes = True
+
+class Ordenamiento(str, Enum):
+    TITULO = "titulo"
+    FECHA = "fecha"
+    RECIENTE = "reciente"
