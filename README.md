@@ -73,6 +73,11 @@ gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker
 - **GET /**: Mensaje de bienvenida
 - **POST /recursos/**: Crear nuevo recurso
 - **GET /recursos/**: Obtener lista de recursos
+  - Parámetros opcionales:
+    - orden_por: Campo por el cual ordenar (titulo, fecha, reciente)
+    - direccion: Dirección del ordenamiento (asc o desc)
+    - skip: número de registros a saltar
+    - limit: límite de registros por página
 - **GET /recursos/{recurso_id}**: Obtener recurso por ID
 - **DELETE /recursos/{recurso_id}**: Eliminar recurso por ID
 - **DELETE /recursos/nombre/{titulo}**: Eliminar recurso por título
@@ -88,6 +93,33 @@ gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker
 - **DELETE /tags/{tag_id}**: Eliminar tag por ID
 - **DELETE /tags/nombre/{nombre}**: Eliminar tag por nombre
 
+## Ejemplos de Uso
+
+### Ordenamiento de Recursos
+```bash
+# Ordenar alfabéticamente por título (ascendente)
+GET /recursos/?orden_por=titulo&direccion=asc
+
+# Ordenar por fecha de creación (más recientes primero)
+GET /recursos/?orden_por=fecha&direccion=desc
+
+# Ordenar por última actualización
+GET /recursos/?orden_por=reciente&direccion=desc
+
+# Combinar ordenamiento con paginación
+GET /recursos/?orden_por=titulo&direccion=asc&skip=0&limit=10
+```
+### Busqueda y filtrado
+```bash
+# Buscar recursos con término específico
+GET /recursos/buscar/?q=python
+
+# Filtrar por tag
+GET /recursos/buscar/?tag=backend
+
+# Búsqueda combinada con paginación
+GET /recursos/buscar/?q=python&tag=backend&skip=0&limit=10
+```
 ## Modelos de Datos
 
 ### Recurso
