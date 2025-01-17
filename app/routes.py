@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import List, Optional
 from app.database import get_db
 from app.models import Recurso, Tag
-from app.schemas import RecursoCreate, RecursoResponse, TagResponse
+from app.schemas import RecursoCreate, RecursoResponse, TagResponse, Ordenamiento
 
 router = APIRouter()
 
@@ -13,14 +13,36 @@ def read_root():
     return {"message": "Bienvenido a la API de recursos"}
 
 @router.get("/recursos/", response_model=List[RecursoResponse])
-def get_recursos(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def get_recursos(
+    skip: int = 0, 
+    limit: int = 10,
+    orden_por: Ordenamiento = Query(Ordenamiento.TITULO, description="Campo por el cual ordenar"),
+    direccion: str = Query("asc", description="Dirección del ordenamiento (asc o desc)"),
+    db: Session = Depends(get_db)
+):
     try:
-        recursos = db.query(Recurso).offset(skip).limit(limit).all()
+        query = db.query(Recurso)
+        
+        # Mapeo de criterios de ordenamiento
+        criterios_ordenamiento = {
+            Ordenamiento.TITULO: Recurso.titulo,
+            Ordenamiento.FECHA: Recurso.fecha_creacion,
+            Ordenamiento.RECIENTE: Recurso.fecha_actualizacion
+        }
+        
+        # Aplicar el ordenamiento
+        if direccion.lower() == "desc":
+            query = query.order_by(criterios_ordenamiento[orden_por].desc())
+        else:
+            query = query.order_by(criterios_ordenamiento[orden_por].asc())
+            
+        recursos = query.offset(skip).limit(limit).all()
         return recursos
+        
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail= f"Error al obtener los recursos {e}"
+            detail=f"Error al obtener los recursos: {e}"
         )
 
 @router.post("/recursos/", response_model=RecursoResponse)
